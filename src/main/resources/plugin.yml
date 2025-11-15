@@ -1,0 +1,4 @@
+name: YalrGuild
+version: '${project.version}'
+main: com.yalrguild.YalrGuild
+api-version: '1.21'
