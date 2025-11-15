@@ -12,6 +12,6 @@ public final class YalrGuild extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        
+
     }
 }
