@@ -1,0 +1,8 @@
+com\yalrguild\Guild.class
+com\yalrguild\GuildManager.class
+com\yalrguild\database\DatabaseManager.class
+com\yalrguild\commands\Clancommands.class
+com\yalrguild\YalrGuild.class
+com\yalrguild\GuildWar.class
+com\yalrguild\GuildMember.class
+com\yalrguild\database\Database.class

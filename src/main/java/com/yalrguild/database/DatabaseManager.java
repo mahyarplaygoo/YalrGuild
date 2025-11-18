@@ -84,6 +84,17 @@ public class DatabaseManager{
         }
         return null;
     }
+    public Guild getClanByName(String name) throws SQLException{
+        String sql = "SELECT * FROM clan WHERE name = ?";
+        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
+            pstmt.setString(1, name);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                return resultSetToClan(rs);
+            }
+        }
+        return null;
+    }
 
     public List<Guild> getAllClans() throws SQLException{
         List<Guild> clans = new ArrayList<>();
@@ -165,7 +176,7 @@ public class DatabaseManager{
             pstmt.setInt(2, clanId);
             ResultSet rs = pstmt.executeQuery();
             if(rs.next()){
-                return resultSetToClan(rs);
+                return resultSetToClanMember(rs);
             }
         }
         return null;

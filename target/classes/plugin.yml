@@ -1,0 +1,4 @@
+name: YalrGuild
+version: '1.0-BETA'
+main: com.yalrguild.YalrGuild
+api-version: '1.21'
