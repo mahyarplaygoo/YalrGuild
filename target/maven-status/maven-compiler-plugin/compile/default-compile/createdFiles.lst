@@ -1,8 +1,14 @@
-com\yalrguild\Guild.class
-com\yalrguild\GuildManager.class
-com\yalrguild\database\DatabaseManager.class
+com\yalrguild\listener\ClanChatListener.class
 com\yalrguild\commands\Clancommands.class
 com\yalrguild\YalrGuild.class
+com\yalrguild\Gui\ClanListGUI.class
+com\yalrguild\Guild.class
+com\yalrguild\GuildUpgrade.class
+com\yalrguild\GuildManager.class
+com\yalrguild\database\DatabaseManager.class
+com\yalrguild\listener\InfoGUIListener$1.class
+com\yalrguild\Gui\ClanInfoGUI.class
 com\yalrguild\GuildWar.class
+com\yalrguild\listener\InfoGUIListener.class
 com\yalrguild\GuildMember.class
 com\yalrguild\database\Database.class

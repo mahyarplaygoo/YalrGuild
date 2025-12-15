@@ -13,9 +13,12 @@ import java.util.UUID;
 
 public class GuildManager {
     private DatabaseManager databaseManager;
+    private GuildUpgrade guildUpgrade;
 
-    public GuildManager(DatabaseManager databaseManager){
+    public GuildManager(DatabaseManager databaseManager, GuildUpgrade guildUpgrade){
+
         this.databaseManager = databaseManager;
+        this.guildUpgrade = guildUpgrade;
     }
 
     public boolean createClan(Player owner, String name, String tag){
@@ -75,6 +78,8 @@ public class GuildManager {
             }
 
             GuildMember newMember = new GuildMember(target.getUniqueId() ,"MEMBER", clan.getId());
+            guildUpgrade.addXp(5, true);
+
             databaseManager.addClanMember(newMember);
             return true;
         }catch (SQLException e){
@@ -225,5 +230,6 @@ public class GuildManager {
             return false;
         }
     }
+
 
 }

@@ -22,38 +22,46 @@ public class DatabaseManager{
         }
     }
 
-    private void createTables() throws SQLException{
-        String createClanTable = "CREATE TABLE IF NOT EXISTS clan (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "name TEXT NOT NULL UNIQUE," +
-                "owner TEXT NOT NULL," +
-                "tag TEXT NOT NULL UNIQUE," +
-                "level INTEGER DEFAULT 1," +
-                "xp INTEGER DELAULT 0," +
-                "createat DATETIME DEFAULT CURRENT_TIMESTAMP";
-        String createClanMemberTable = "CREATE TABLE IF NOT EXISTS clan_member(" +
-                "uuid TEXT NOT NULL," +
-                "clan_id INTEGER NOT NULL," +
-                "rank TEXT DEFAULT 'MEMBER'," +
-                "joined_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
-                "PRIMARY KEY (uuid, clan_id)," +
-                "FOREIGN KEY (clan_id) REFERENCES clan(id) ON DELETE CASCADE";
+    private void createTables() throws SQLException {
 
-        String createClanWarTable = "CREATE TABLE IF NOT EXISTS clan_war (" +
-                "clanid1 INTEGER NOT NULL," +
-                "clanid2 INTEGER NOT NULL," +
-                "winner INTEGER," +
-                "players TEXT," +
-                "FOREIGN KEY (clanid1) REFERENCES clan(id)," +
-                "FOREIGN KEY (clanid2) REFERENCES clan(id))";
+        String createClanTable =
+                "CREATE TABLE IF NOT EXISTS clan (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                        "name TEXT NOT NULL UNIQUE," +
+                        "owner TEXT NOT NULL," +
+                        "tag TEXT NOT NULL UNIQUE," +
+                        "level INTEGER DEFAULT 1," +
+                        "xp INTEGER DEFAULT 0," +
+                        "createat DATETIME DEFAULT CURRENT_TIMESTAMP" +
+                        ")";
 
+        String createClanMemberTable =
+                "CREATE TABLE IF NOT EXISTS clan_member(" +
+                        "uuid TEXT NOT NULL," +
+                        "clan_id INTEGER NOT NULL," +
+                        "rank TEXT DEFAULT 'MEMBER'," +
+                        "joined_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
+                        "PRIMARY KEY (uuid, clan_id)," +
+                        "FOREIGN KEY (clan_id) REFERENCES clan(id) ON DELETE CASCADE" +
+                        ")";
 
-        try(Statement stmt = connection.createStatement()){
+        String createClanWarTable =
+                "CREATE TABLE IF NOT EXISTS clan_war (" +
+                        "clanid1 INTEGER NOT NULL," +
+                        "clanid2 INTEGER NOT NULL," +
+                        "winner INTEGER," +
+                        "players TEXT," +
+                        "FOREIGN KEY (clanid1) REFERENCES clan(id)," +
+                        "FOREIGN KEY (clanid2) REFERENCES clan(id)" +
+                        ")";
+
+        try (Statement stmt = connection.createStatement()) {
             stmt.execute(createClanTable);
             stmt.execute(createClanMemberTable);
             stmt.execute(createClanWarTable);
         }
     }
+
     public void createClan(Guild clan) throws SQLException {
         String sql = "INSERT INTO clan (name, owner, tag, level, xp, createat) VALUES (?, ?, ?, ?, ?, ?)";
         try(PreparedStatement pstmt = connection.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS)){
@@ -141,13 +149,13 @@ public class DatabaseManager{
         return clan;
     }
 
-    public void addClanMember(GuildMember memeber) throws SQLException{
+    public void addClanMember(GuildMember member) throws SQLException{
         String sql = "INSERT INTO clan_member (uuid, clan_id, rank, joined_at) VALUES(?, ?, ?, ?)";
         try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setString(1, memeber.getUUID().toString());
-            pstmt.setInt(2, memeber.getClanid());
-            pstmt.setString(3,memeber.getRank());
-            pstmt.setTimestamp(4, new Timestamp(memeber.getJoinedAt().getTime()));
+            pstmt.setString(1, member.getUUID().toString());
+            pstmt.setInt(2, member.getClanid());
+            pstmt.setString(3,member.getRank());
+            pstmt.setTimestamp(4, new Timestamp(member.getJoinedAt().getTime()));
             pstmt.executeUpdate();
         }
     }
@@ -196,7 +204,7 @@ public class DatabaseManager{
         return members;
     }
     public Guild getPlayerClan(UUID playerUuid) throws SQLException{
-        String sql = "SELECT c.* FROM clan c JOIN clan_memeber cm ON c.id = cm.clan_id WHERE cm.uuid = ?";
+        String sql = "SELECT c.* FROM clan c JOIN clan_member cm ON c.id = cm.clan_id WHERE cm.uuid = ?";
         try(PreparedStatement pstmt = connection.prepareStatement(sql)){
             pstmt.setString(1, playerUuid.toString());
             ResultSet rs = pstmt.executeQuery();
