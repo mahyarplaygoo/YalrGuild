@@ -82,6 +82,13 @@ public class ClanInfoGUI {
         ItemStack members = createItem(Material.PLAYER_HEAD, "§b§lMembers",
                 Arrays.asList("§7Left Click to Show Clan Members"));
         gui.setItem(21, members);
+
+
+        ItemStack leave = createItem(Material.RED_BED, "§b§lLeave",
+                Arrays.asList("" +
+                        "§7Left Click to leave"
+                ));
+        gui.setItem(20, leave);
     }
 
     private String getPlayerName(UUID uuid) {

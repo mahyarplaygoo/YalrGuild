@@ -36,15 +36,30 @@ public class InfoGUIListener implements Listener {
 
         Player player = (Player) event.getWhoClicked();
 
+        switch (item.getType()) {
+            case PLAYER_HEAD -> {
 
-        if (item.getType() == Material.PLAYER_HEAD) {
+                Guild guild = guildManager.getPlayerClan(player.getUniqueId());
+                if (guild == null) return;
+                new ClanInfoGUI(guildManager, player).openMemberList();
+            }
+            case RED_BED -> {
+                Guild guild = guildManager.getPlayerClan(player.getUniqueId());
+                if (guild == null) {
+                    player.sendMessage("§cYou are not in a guild!");
+                    return;
+                }
 
-            Guild guild = guildManager.getPlayerClan(player.getUniqueId());
-            if (guild == null) return;
-
-
-            new ClanInfoGUI(guildManager, player).openMemberList();
+                boolean success = guildManager.leaveClan(player);
+                if (success) {
+                    player.sendMessage("§aYou have left the guild: " + guild.getName());
+                    player.closeInventory();
+                } else {
+                    player.sendMessage("§cYou cannot leave the guild as the owner!");
+                }
+            }
         }
+
     }
 
     @EventHandler

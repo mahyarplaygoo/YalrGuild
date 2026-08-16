@@ -5,20 +5,27 @@ import org.bukkit.ChatColor;
 
 public class GuildUpgrade {
 
-    private final Player player;
     private final GuildManager guildManager;
-    private Guild guild;
 
-    public GuildUpgrade(Guild guild, Player player, GuildManager guildManager) {
-        this.player = player;
+    public GuildUpgrade(GuildManager guildManager) {
         this.guildManager = guildManager;
-        this.guild = guildManager.getPlayerClan(player.getUniqueId());
     }
 
+    public boolean addXp(Player player, int xp, boolean sendMessage) {
+        Guild guild = guildManager.getPlayerClan(player.getUniqueId());
+        if (guild == null) return false;
 
-    public boolean checkUpgrade() {
+        guild.setXp(guild.getXp() + xp);
 
-        int xpNeeded = xpNeeded();
+        if (sendMessage) {
+            player.sendMessage(ChatColor.GREEN + "You earned " + xp + " XP!");
+        }
+
+        return checkUpgrade(player, guild);
+    }
+
+    private boolean checkUpgrade(Player player, Guild guild) {
+        int xpNeeded = xpNeeded(guild.getLevel());
 
         if (guild.getXp() >= xpNeeded) {
             guild.setLevel(guild.getLevel() + 1);
@@ -35,25 +42,11 @@ public class GuildUpgrade {
         return false;
     }
 
-
-    public void addXp(int xp, boolean isSendMessage) {
-        guild.setXp(guild.getXp() + xp);
-
-        if (isSendMessage) {
-            player.sendMessage(ChatColor.GREEN + "You earned " + xp + " XP!");
-        }
-
-        checkUpgrade();
-    }
-
-
     private static int calcXpNeeded(int level, int baseXP, double exponent) {
         return (int) (baseXP * Math.pow(level, exponent));
     }
 
-
-    public int xpNeeded() {
-        return calcXpNeeded(guild.getLevel(), 100, 1.5);
-
+    public int xpNeeded(int level) {
+        return calcXpNeeded(level, 100, 1.5);
     }
 }

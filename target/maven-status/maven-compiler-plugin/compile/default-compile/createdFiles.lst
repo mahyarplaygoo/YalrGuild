@@ -2,6 +2,7 @@ com\yalrguild\listener\ClanChatListener.class
 com\yalrguild\commands\Clancommands.class
 com\yalrguild\YalrGuild.class
 com\yalrguild\Gui\ClanListGUI.class
+com\yalrguild\listener\ListGUIListener.class
 com\yalrguild\Guild.class
 com\yalrguild\GuildUpgrade.class
 com\yalrguild\GuildManager.class

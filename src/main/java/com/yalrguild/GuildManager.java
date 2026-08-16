@@ -5,15 +5,21 @@ import com.yalrguild.database.DatabaseManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import org.bukkit.ChatColor;
+
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import net.md_5.bungee.api.chat.*;
 
 
 public class GuildManager {
     private DatabaseManager databaseManager;
     private GuildUpgrade guildUpgrade;
+    public Map<UUID, Integer> pendingInvites = new HashMap<>();
 
     public GuildManager(DatabaseManager databaseManager, GuildUpgrade guildUpgrade){
 
@@ -61,28 +67,52 @@ public class GuildManager {
             return false;
         }
     }
-    public boolean invitePlayer(Player inviter, String targetPlayerName){
-        try{
+    public boolean invitePlayer(Player inviter, String targetPlayerName) {
+        try {
             Guild clan = getPlayerClan(inviter.getUniqueId());
-            if (clan == null){
-                return false;
-            }
-
+            if (clan == null) return false;
             GuildMember inviterMember = databaseManager.getClanMember(inviter.getUniqueId(), clan.getId());
-            if (!inviterMember.getRank().equals("OWNER") && !inviterMember.getRank().equals("OFFICER")){
-                return false;
-            }
+            if (!inviterMember.getRank().equals("OWNER") && !inviterMember.getRank().equals("OFFICER")) return false;
             Player target = Bukkit.getPlayer(targetPlayerName);
-            if(target == null || getPlayerClan(target.getUniqueId()) != null){
+            if(target == null || getPlayerClan(target.getUniqueId()) != null) return false;
+
+
+            // pending
+            pendingInvites.put(target.getUniqueId(), clan.getId());
+
+            TextComponent accept = new TextComponent("Accept Invite");
+            accept.setColor(ChatColor.YELLOW);
+            accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/guild accept"));
+            target.spigot().sendMessage(new TextComponent(ChatColor.YELLOW + "Your Invited to " + clan.getName() + " Clan"), accept);
+            return true;
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean acceptInvite(Player player){
+        try{
+            if (!pendingInvites.containsKey(player.getUniqueId())){
+                player.sendMessage(ChatColor.RED + "You don't have any Invite");
+                return false;
+            }
+            int clanId = pendingInvites.get(player.getUniqueId());
+
+            if (getPlayerClan(player.getUniqueId()) != null){
+                player.sendMessage(ChatColor.RED + "You are in Clan");
                 return false;
             }
 
-            GuildMember newMember = new GuildMember(target.getUniqueId() ,"MEMBER", clan.getId());
-            guildUpgrade.addXp(5, true);
-
+            GuildMember newMember = new GuildMember(player.getUniqueId(), "MEMBER", clanId)
             databaseManager.addClanMember(newMember);
+
+            pendingInvites.remove(player.getUniqueId());
+            player.sendMessage(ChatColor.GREEN + "You have successfully joined the clan");
+
             return true;
-        }catch (SQLException e){
+        }catch(SQLException e){
             e.printStackTrace();
             return false;
         }

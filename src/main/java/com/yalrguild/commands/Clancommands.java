@@ -148,7 +148,7 @@ public class Clancommands implements CommandExecutor, TabCompleter {
                 new ClanListGUI(guildManager, player).open();
                 break;
             case "leave":
-                player.sendMessage(ChatColor.RED + "This Commands not active");
+                guildManager.leaveClan(player);
                 break;
             case "war":
                 player.sendMessage(ChatColor.RED + "This Commands not active");

@@ -6,9 +6,7 @@ import com.yalrguild.listener.ClanChatListener;
 import com.yalrguild.listener.InfoGUIListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public final class YalrGuild extends JavaPlugin {
 
@@ -16,6 +14,9 @@ public final class YalrGuild extends JavaPlugin {
 
     private final Set<UUID> clanChatMode = new HashSet<>();
     private DatabaseManager databaseManager;
+
+
+
     private GuildManager guildManager;
     private GuildMember guildMember;
     private GuildUpgrade guildUpgrade;
@@ -27,6 +28,9 @@ public final class YalrGuild extends JavaPlugin {
         // Load database
         this.databaseManager = new DatabaseManager();
         databaseManager.initialize();
+
+        // Create guild upgrade
+        this.guildUpgrade = new GuildUpgrade(guildManager);
 
         // Create guild manager
         this.guildManager = new GuildManager(databaseManager, guildUpgrade);

@@ -47,6 +47,7 @@ public class DatabaseManager{
 
         String createClanWarTable =
                 "CREATE TABLE IF NOT EXISTS clan_war (" +
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                         "clanid1 INTEGER NOT NULL," +
                         "clanid2 INTEGER NOT NULL," +
                         "winner INTEGER," +
@@ -223,17 +224,64 @@ public class DatabaseManager{
         member.setJoinedAt(rs.getTimestamp("joined_at"));
         return member;
     }
-    public void createClanWar(GuildWar war) throws SQLException{
-        String sql = "INSERT INTO clan_war (clanid1, clanid2, winner, players) VALUES (?, ?, ?, ?)";
-        try(PreparedStatement pstmt = connection.prepareStatement(sql)){
-            pstmt.setInt(1, war.getClanid1());
-            pstmt.setInt(2,war.getClanid2());
-            pstmt.setObject(3 , war.getWinner());
-            pstmt.setString(4, war.getPlayers() !=null ?
-                    String.join(",", war.getPlayers().stream().map(UUID::toString).toArray(String[]::new)) : null);
-            pstmt.executeUpdate();
-        }
+    public int createClanWar(int clanId1, int clanId2) {
+        String sql = "INSERT INTO clan_war (clanid1, clanid2, players) VALUES (?, ?, ?)";
+        int generatedWarId = -1;
 
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, clanId1);
+            pstmt.setInt(2, clanId2);
+            pstmt.setString(3, "");
+
+            int affectedRows = pstmt.executeUpdate();
+
+            if (affectedRows > 0) {
+
+                try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        generatedWarId = generatedKeys.getInt(1);
+                    } else {
+                        System.err.println("Creating clan war failed, no ID obtained.");
+                    }
+                }
+            } else {
+                System.err.println("Creating clan war failed, no rows affected.");
+            }
+        } catch (SQLException e) {
+            System.err.println("Error creating clan war: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return generatedWarId;
+    }
+    public Map<String, Object> getClanWar(int warId) {
+        String sql = "SELECT clanid1, clanid2, winner, players FROM clan_war WHERE id = ?";
+        Map<String, Object> warDetails = null;
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, warId);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    warDetails = new HashMap<>();
+                    warDetails.put("clanid1", rs.getInt("clanid1"));
+                    warDetails.put("clanid2", rs.getInt("clanid2"));
+
+                    int winnerId = rs.getInt("winner");
+                    if (!rs.wasNull()) {
+                        warDetails.put("winner", winnerId);
+                    } else {
+                        warDetails.put("winner", null);
+                    }
+                    // فعلاً players را به صورت رشته خام برمی‌گردانیم
+                    String playersText = rs.getString("players");
+                    warDetails.put("players", parsePlayersFromText(playersText));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error retrieving clan war with ID " + warId + ": " + e.getMessage());
+            e.printStackTrace();
+        }
+        return warDetails;
     }
 
         public void closeConnection(){
